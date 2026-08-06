@@ -1,0 +1,76 @@
+/* ==================== THEME VARIABLES ==================== */
+:root[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --bg-elevated: #ffffff;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    
+    --border-color: #e2e8f0;
+    --border-hover: #cbd5e1;
+    
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-light: rgba(16, 185, 129, 0.1);
+    
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 20px 40px rgba(16, 185, 129, 0.15);
+    
+    --orb-1: #a7f3d0;
+    --orb-2: #bae6fd;
+    --orb-3: #fcd34d;
+    
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="dark"] {
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --bg-tertiary: #1e293b;
+    --bg-elevated: #1e293b;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --border-color: #1e293b;
+    --border-hover: #334155;
+    
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-light: rgba(16, 185, 129, 0.15);
+    
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 20px 40px rgba(16, 185, 129, 0.2);
+    
+    --orb-1: #064e3b;
+    --orb-2: #164e63;
+    --orb-3: #78350f;
+    
+    --glass-bg: rgba(15, 23, 42, 0.7);
+    --glass-border: rgba(99, 102, 241, 0.1);
+}
+
+/* ==================== GLOBAL VARIABLES ==================== */
+:root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --container-max: 1280px;
+    --nav-height: 72px;
+}
