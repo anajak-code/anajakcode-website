@@ -1,154 +1,195 @@
-import { animateCounter } from './utils.js';
+import { Storage } from './storage.js';
+import { showError } from './notifications.js';
 
-const API_BASE = 'https://router.anajakcode.site/api/v1';
+const API_BASE = 'https://api.anajakcode.site/api/v1';
 
-// State
-export const AppState = {
-    authToken: localStorage.getItem('token'),
-    currentUser: JSON.parse(localStorage.getItem('user') || 'null'),
-    allPlugins: [],
-    filteredPlugins: [],
-    currentFilter: '',
-    currentSort: 'newest',
-    favorites: JSON.parse(localStorage.getItem('favorites') || '[]')
-};
-
-// Category icons mapping
-export const categoryIcons = {
-    'Core': 'fa-cube',
-    'World': 'fa-globe',
-    'Economy': 'fa-coins',
-    'Admin': 'fa-shield-halved',
-    'Gameplay': 'fa-gamepad',
-    'Utility': 'fa-wrench',
-    'default': 'fa-puzzle-piece'
-};
-
-// API Fetch with Auth
-export async function apiFetch(url, options = {}) {
+/**
+ * Core API fetch with auth handling
+ */
+async function apiFetch(url, options = {}) {
+    const token = Storage.getToken();
     const headers = { ...options.headers };
-    if (AppState.authToken) headers['Authorization'] = `Bearer ${AppState.authToken}`;
-    if (!options.body || !(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
     
-    const res = await fetch(url, { ...options, headers });
-    if (res.status === 401) {
-        logout();
-        throw new Error('Session expired');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
     }
-    return res;
-}
-
-// Load Plugins
-export async function loadPlugins() {
+    
+    if (!options.body || !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+    
     try {
-        const res = await fetch(`${API_BASE}/plugins/`);
-        AppState.allPlugins = await res.json();
+        const res = await fetch(url, { ...options, headers });
         
-        // Load stats
-        try {
-            const statsRes = await fetch(`${API_BASE}/plugins/admin/stats`);
-            if (statsRes.ok) {
-                const stats = await statsRes.json();
-                animateCounter(document.getElementById('total-plugins'), stats.total_plugins || AppState.allPlugins.length);
-                animateCounter(document.getElementById('total-downloads'), stats.total_downloads || 0);
+        // Handle 401 - session expired
+        if (res.status === 401) {
+            Storage.clearAuth();
+            if (!url.includes('/auth/')) {
+                showError('Session expired. Please login again.');
+                setTimeout(() => {
+                    window.location.href = '/login/';
+                }, 1500);
             }
-        } catch(e) {
-            animateCounter(document.getElementById('total-plugins'), AppState.allPlugins.length);
+            throw new Error('Session expired');
         }
         
-        window.App.applyFiltersAndSort();
+        // Handle 403 - forbidden (domain blocked or no permission)
+        if (res.status === 403) {
+            const data = await res.json().catch(() => ({}));
+            showError(data.message || 'Access denied');
+            throw new Error('Forbidden');
+        }
+        
+        return res;
     } catch (err) {
-        document.getElementById('plugins-grid').innerHTML = `
-            <div class="empty-state col-span-full">
-                <div class="empty-state-icon">
-                    <i class="fas fa-wifi-slash"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Connection Error</h3>
-                <p class="mb-4">Failed to connect to backend</p>
-                <button onclick="window.API.loadPlugins()" class="btn-primary px-6 py-2 rounded-xl text-sm font-medium">
-                    <i class="fas fa-rotate-right mr-2"></i> Retry
-                </button>
-            </div>
-        `;
+        console.error('[API] Fetch error:', err);
+        throw err;
     }
 }
 
-// Download Plugin
-export async function downloadPlugin(id, name) {
-    try {
-        window.location.href = `${API_BASE}/plugins/download/${id}`;
-        window.UI.showToast(`Downloading ${name}...`, 'fa-download', '#10b981');
-        setTimeout(loadPlugins, 2000);
-    } catch (err) {
-        window.UI.showToast('Download failed', 'fa-circle-exclamation', '#ef4444');
+/**
+ * Get JSON response
+ */
+async function getJson(url, options = {}) {
+    const res = await apiFetch(url, options);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+        throw new Error(err.detail || `HTTP ${res.status}`);
     }
+    return res.json();
 }
 
-// Submit Review
-export async function submitReview(pluginId, rating, comment) {
-    const res = await apiFetch(`${API_BASE}/plugins/${pluginId}/reviews`, { 
-        method: 'POST', 
-        body: JSON.stringify({ rating, comment }) 
-    });
-    return res;
-}
-
-// Login
-export async function login(data) {
-    const res = await fetch(`${API_BASE}/auth/login`, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(data) 
-    });
-    return res;
-}
-
-// Register
-export async function register(data) {
-    const res = await fetch(`${API_BASE}/auth/register`, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(data) 
-    });
-    return res;
-}
-
-// Search
-export async function searchPlugins(query) {
-    const res = await fetch(`${API_BASE}/plugins/search?q=${encodeURIComponent(query)}`);
-    return await res.json();
-}
-
-// Logout
-export function logout() {
-    AppState.authToken = null;
-    AppState.currentUser = null;
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.App.updateUserSection();
-    window.UI.showToast('Logged out successfully', 'fa-right-from-bracket', '#f59e0b');
-}
-
-// Toggle Favorite
-export function toggleFavorite(id) {
-    const idx = AppState.favorites.indexOf(id);
-    if (idx > -1) {
-        AppState.favorites.splice(idx, 1);
-        window.UI.showToast('Removed from favorites', 'fa-heart', '#ef4444');
-    } else {
-        AppState.favorites.push(id);
-        window.UI.showToast('Added to favorites', 'fa-heart', '#ef4444');
+// ==================== AUTH API ====================
+export const AuthAPI = {
+    login(username, password) {
+        return apiFetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+        });
+    },
+    
+    register(username, email, password) {
+        return apiFetch(`${API_BASE}/auth/register`, {
+            method: 'POST',
+            body: JSON.stringify({ username, email, password })
+        });
+    },
+    
+    me() {
+        return getJson(`${API_BASE}/auth/me`);
+    },
+    
+    changePassword(oldPassword, newPassword) {
+        return apiFetch(`${API_BASE}/auth/change-password`, {
+            method: 'POST',
+            body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+        });
     }
-    localStorage.setItem('favorites', JSON.stringify(AppState.favorites));
-    window.UI.renderPlugins(AppState.filteredPlugins);
-}
-
-// Expose to window for HTML onclick
-window.API = {
-    loadPlugins,
-    downloadPlugin,
-    toggleFavorite,
-    logout,
-    AppState,
-    categoryIcons
 };
+
+// ==================== PLUGINS API ====================
+export const PluginsAPI = {
+    getAll() {
+        return getJson(`${API_BASE}/plugins/`);
+    },
+    
+    getById(id) {
+        return getJson(`${API_BASE}/plugins/${id}`);
+    },
+    
+    search(query) {
+        return getJson(`${API_BASE}/plugins/search?q=${encodeURIComponent(query)}`);
+    },
+    
+    upload(formData) {
+        return apiFetch(`${API_BASE}/plugins/upload`, {
+            method: 'POST',
+            body: formData
+        });
+    },
+    
+    delete(id) {
+        return apiFetch(`${API_BASE}/plugins/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    downloadUrl(id) {
+        return `${API_BASE}/plugins/download/${id}`;
+    },
+    
+    getReviews(pluginId) {
+        return getJson(`${API_BASE}/plugins/${pluginId}/reviews`);
+    },
+    
+    addReview(pluginId, rating, comment) {
+        return apiFetch(`${API_BASE}/plugins/${pluginId}/reviews`, {
+            method: 'POST',
+            body: JSON.stringify({ rating, comment })
+        });
+    }
+};
+
+// ==================== ADMIN API ====================
+export const AdminAPI = {
+    getStats() {
+        return getJson(`${API_BASE}/plugins/admin/stats`);
+    },
+    
+    getCharts() {
+        return getJson(`${API_BASE}/plugins/admin/charts`);
+    },
+    
+    getUsers() {
+        return getJson(`${API_BASE}/plugins/admin/users`);
+    },
+    
+    getAllReviews() {
+        return getJson(`${API_BASE}/admin/reviews`);
+    },
+    
+    approveReview(id) {
+        return apiFetch(`${API_BASE}/admin/reviews/${id}/approve`, {
+            method: 'POST'
+        });
+    },
+    
+    rejectReview(id) {
+        return apiFetch(`${API_BASE}/admin/reviews/${id}/reject`, {
+            method: 'POST'
+        });
+    },
+    
+    getBlockedIPs() {
+        return getJson(`${API_BASE}/admin/blocked-ips`);
+    },
+    
+    blockIP(ip) {
+        return apiFetch(`${API_BASE}/admin/block-ip`, {
+            method: 'POST',
+            body: JSON.stringify({ ip })
+        });
+    },
+    
+    unblockIP(ip) {
+        return apiFetch(`${API_BASE}/admin/blocked-ips/${encodeURIComponent(ip)}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    getBackups() {
+        return getJson(`${API_BASE}/admin/backups`);
+    },
+    
+    createBackup() {
+        return apiFetch(`${API_BASE}/admin/backups/create`, {
+            method: 'POST'
+        });
+    },
+    
+    getSystemStats() {
+        return getJson(`${API_BASE}/admin/system-stats`);
+    }
+};
+
+export { API_BASE };
