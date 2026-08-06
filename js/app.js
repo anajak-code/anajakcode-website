@@ -1,250 +1,307 @@
-import { AppState, loadPlugins } from './api.js';
-import { renderPlugins, openAuthModal, closeAuthModal, closeDetailsModal, closeReviewModal, showToast } from './ui.js';
-import { debounce } from './utils.js';
+import { Storage } from './storage.js';
+import { Auth } from './auth.js';
+import { Theme } from './theme.js';
+import { PluginsAPI } from './api.js';
+import { Modals } from './modals.js';
+import { Search } from './search.js';
+import { Charts } from './charts.js';
+import { copyToClipboard, categoryIcons, escapeHtml } from './utils.js';
+import { showSuccess, showError } from './notifications.js';
 
-// Theme Management
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const newTheme = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-}
-
-function updateThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    if (theme === 'light') {
-        icon.classList.remove('fa-sun', 'text-amber-400');
-        icon.classList.add('fa-moon', 'text-slate-600');
-    } else {
-        icon.classList.remove('fa-moon', 'text-slate-600');
-        icon.classList.add('fa-sun', 'text-amber-400');
-    }
-}
-
-// Initialize Theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', savedTheme);
-updateThemeIcon(savedTheme);
-
-// PWA Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
-}
-
-// User Section
-function updateUserSection() {
-    const section = document.getElementById('user-section');
-    if (AppState.currentUser) {
-        section.innerHTML = `
-            <div class="flex items-center gap-2 px-3 py-2 rounded-xl" style="background: var(--bg-secondary); border: 1px solid var(--border-color);">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
-                    ${AppState.currentUser.username.charAt(0).toUpperCase()}
-                </div>
-                <span class="text-sm font-semibold hidden md:inline" style="color: var(--text-primary);">${AppState.currentUser.username}</span>
-            </div>
-            <button onclick="window.API.logout()" class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-400 transition" style="color: var(--text-secondary);" title="Logout">
-                <i class="fas fa-right-from-bracket"></i>
-            </button>
-        `;
-    } else {
-        section.innerHTML = `
-            <button onclick="window.UI.openAuthModal('login')" class="hidden sm:flex btn-ghost px-4 py-2 rounded-xl text-sm font-medium items-center gap-2">
-                <i class="fas fa-right-to-bracket text-xs"></i> Login
-            </button>
-            <button onclick="window.UI.openAuthModal('register')" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">
-                Get Started
-            </button>
-        `;
-    }
-}
-
-// Filter & Sort
-function filterCategory(cat) {
-    AppState.currentFilter = cat;
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.classList.remove('active');
-    });
-    const activeChip = document.querySelector(`.filter-chip[data-category="${cat}"]`);
-    if (activeChip) activeChip.classList.add('active');
-    applyFiltersAndSort();
-}
-
-function toggleSortMenu() {
-    document.getElementById('sort-menu').classList.toggle('show');
-}
-
-function setSort(sort, label) {
-    AppState.currentSort = sort;
-    document.getElementById('sort-label').textContent = label;
-    document.querySelectorAll('.sort-option').forEach(opt => opt.classList.remove('active'));
-    document.querySelector(`.sort-option[data-sort="${sort}"]`).classList.add('active');
-    document.getElementById('sort-menu').classList.remove('show');
-    applyFiltersAndSort();
-}
-
-function applyFiltersAndSort() {
-    let plugins = [...AppState.allPlugins];
-    
-    // Filter
-    if (AppState.currentFilter) {
-        plugins = plugins.filter(p => p.category === AppState.currentFilter);
-    }
-    
-    // Sort
-    switch(AppState.currentSort) {
-        case 'newest':
-            plugins.sort((a, b) => (b.id || 0) - (a.id || 0));
-            break;
-        case 'popular':
-            plugins.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0));
-            break;
-        case 'rated':
-            plugins.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-            break;
-        case 'az':
-            plugins.sort((a, b) => a.name.localeCompare(b.name));
-            break;
-        case 'favorites':
-            plugins = plugins.filter(p => AppState.favorites.includes(p.id));
-            break;
-    }
-    
-    AppState.filteredPlugins = plugins;
-    renderPlugins(plugins);
-}
-
-// Search with debounce
-const searchHandler = debounce(async (e) => {
-    const q = e.target.value.trim();
-    
-    if (q.length < 2) { 
-        applyFiltersAndSort(); 
-        return; 
-    }
-    
-    try {
-        const plugins = await window.API.searchPlugins(q);
-        renderPlugins(plugins);
-    } catch (err) { 
-        console.error('Search failed:', err); 
-    }
-}, 300);
-
-// Event Listeners
-function setupEventListeners() {
-    // Search
-    document.getElementById('search').addEventListener('input', searchHandler);
-    
-    // Auth Form
-    document.getElementById('auth-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
-        const authMode = document.getElementById('auth-submit-text').textContent === 'Sign In' ? 'login' : 'register';
+/**
+ * Main Application
+ */
+const App = {
+    async init() {
+        console.log('🚀 AnajakCode App initializing...');
         
-        try {
-            const endpoint = authMode === 'login' ? `${window.API.API_BASE || 'https://router.anajakcode.site/api/v1'}/auth/login` : `${window.API.API_BASE || 'https://router.anajakcode.site/api/v1'}/auth/register`;
-            const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            const result = await res.json();
-            
-            if (res.ok) {
-                if (authMode === 'login') {
-                    AppState.authToken = result.token; 
-                    AppState.currentUser = result.user;
-                    localStorage.setItem('token', AppState.authToken); 
-                    localStorage.setItem('user', JSON.stringify(AppState.currentUser));
-                    updateUserSection(); 
-                    showToast('Welcome back, ' + AppState.currentUser.username + '!', 'fa-hand-peace', '#10b981');
-                } else {
-                    showToast('Account created! Please login.', 'fa-user-plus', '#10b981'); 
-                    openAuthModal('login');
-                }
-                closeAuthModal();
-            } else { 
-                showToast(result.detail || 'Failed', 'fa-circle-exclamation', '#ef4444'); 
-            }
-        } catch (err) { 
-            showToast('Connection error', 'fa-circle-exclamation', '#ef4444'); 
-        }
-    });
-    
-    // Review Form
-    document.getElementById('review-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const pluginId = document.getElementById('review-plugin-id').value;
-        const rating = parseInt(document.getElementById('review-rating').value);
-        const comment = document.getElementById('review-comment').value;
+        // Initialize theme
+        Theme.init();
         
-        if (rating === 0) { 
-            showToast('Please select a rating', 'fa-circle-exclamation', '#f59e0b'); 
-            return; 
+        // Update user UI
+        Auth.updateUserUI();
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Load plugins on home page
+        if (this.isHomePage()) {
+            await this.loadPlugins();
+            Search.initSearch();
         }
         
-        try {
-            const res = await window.API.submitReview(pluginId, rating, comment);
-            if (res.ok) { 
-                showToast('Review submitted! Awaiting approval.', 'fa-check', '#10b981'); 
-                closeReviewModal(); 
-            } else { 
-                const err = await res.json(); 
-                showToast(err.detail || 'Failed', 'fa-circle-exclamation', '#ef4444'); 
-            }
-        } catch (err) { 
-            showToast('Error submitting review', 'fa-circle-exclamation', '#ef4444'); 
+        // PWA service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.warn('SW registration failed:', err);
+            });
         }
-    });
+        
+        console.log('✅ App initialized');
+    },
     
-    // Back to Top
-    window.addEventListener('scroll', () => {
-        const btn = document.getElementById('back-to-top');
-        btn.classList.toggle('show', window.scrollY > 400);
-    });
+    isHomePage() {
+        return window.location.pathname === '/' || window.location.pathname === '/index.html';
+    },
     
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.getElementById('sort-menu').classList.remove('show');
-            closeDetailsModal();
-            closeAuthModal();
-            closeReviewModal();
-        }
-        // ⌘K / Ctrl+K to focus search
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            document.getElementById('search').focus();
-        }
-    });
-    
-    // Close sort menu on outside click
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.sort-dropdown')) {
-            document.getElementById('sort-menu').classList.remove('show');
-        }
-    });
-    
-    // Close modals on overlay click
-    ['details-modal', 'auth-modal', 'review-modal'].forEach(id => {
-        document.getElementById(id).addEventListener('click', (e) => {
-            if (e.target.id === id) {
-                e.target.classList.add('hidden');
-                e.target.classList.remove('flex');
+    setupEventListeners() {
+        // Sort menu toggle
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.sort-dropdown')) {
+                const menu = document.getElementById('sort-menu');
+                if (menu) menu.classList.remove('show');
             }
         });
-    });
-}
-
-// Expose to window
-window.App = {
-    toggleTheme,
-    updateUserSection,
-    filterCategory,
-    toggleSortMenu,
-    setSort,
-    applyFiltersAndSort
+        
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Escape - close modals
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.flex').forEach(modal => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                });
+                document.body.style.overflow = '';
+                
+                const menu = document.getElementById('sort-menu');
+                if (menu) menu.classList.remove('show');
+            }
+            
+            // ⌘K / Ctrl+K - focus search
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                const search = document.getElementById('search');
+                if (search) search.focus();
+            }
+        });
+        
+        // Review form submit
+        const reviewForm = document.getElementById('review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', (e) => Modals.submitReview(e));
+        }
+        
+        // Back to top button
+        this.setupBackToTop();
+        
+        // Listen for filtered plugins event
+        document.addEventListener('pluginsFiltered', (e) => {
+            this.renderPlugins(e.detail.plugins, e.detail.total, e.detail.isSearch);
+        });
+    },
+    
+    setupBackToTop() {
+        const btn = document.getElementById('back-to-top');
+        if (!btn) return;
+        
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('show', window.scrollY > 400);
+        });
+    },
+    
+    async loadPlugins() {
+        try {
+            const plugins = await PluginsAPI.getAll();
+            Search.setPlugins(plugins);
+            
+            // Animate stats if elements exist
+            this.animateStats(plugins);
+        } catch (err) {
+            console.error('Failed to load plugins:', err);
+            this.showErrorState();
+        }
+    },
+    
+    animateStats(plugins) {
+        const totalPluginsEl = document.getElementById('total-plugins');
+        const totalDownloadsEl = document.getElementById('total-downloads');
+        
+        if (totalPluginsEl) {
+            import('./utils.js').then(({ animateCounter }) => {
+                animateCounter(totalPluginsEl, plugins.length);
+            });
+        }
+        
+        if (totalDownloadsEl) {
+            const totalDownloads = plugins.reduce((sum, p) => sum + (p.downloads_count || 0), 0);
+            import('./utils.js').then(({ animateCounter }) => {
+                animateCounter(totalDownloadsEl, totalDownloads);
+            });
+        }
+    },
+    
+    renderPlugins(plugins, totalAll, isSearch = false) {
+        const grid = document.getElementById('plugins-grid');
+        const resultsCount = document.getElementById('results-count');
+        
+        if (!grid) return;
+        
+        // Update results count
+        if (resultsCount) {
+            if (isSearch) {
+                resultsCount.textContent = `${plugins.length} Result${plugins.length !== 1 ? 's' : ''}`;
+            } else {
+                resultsCount.textContent = plugins.length === totalAll
+                    ? 'All Plugins'
+                    : `${plugins.length} Plugin${plugins.length !== 1 ? 's' : ''} Found`;
+            }
+        }
+        
+        if (plugins.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 80px 20px;">
+                    <div class="empty-state-icon" style="width: 100px; height: 100px; border-radius: 24px; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--text-muted); margin: 0 auto 20px;">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">No plugins found</h3>
+                    <p style="color: var(--text-secondary);">Try adjusting your search or filter</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const favorites = Storage.getFavorites();
+        
+        grid.innerHTML = plugins.map(p => {
+            const rating = p.rating || 0;
+            const stars = Array(5).fill(0).map((_, i) => 
+                `<i class="fas fa-star" style="color: ${i < Math.floor(rating) ? '#fbbf24' : 'var(--text-muted)'}; font-size: 11px;"></i>`
+            ).join('');
+            
+            const icon = categoryIcons[p.category] || categoryIcons.default;
+            const isFav = favorites.includes(p.id);
+            const isNew = p.created_at && (new Date() - new Date(p.created_at)) / (1000 * 60 * 60 * 24) < 30;
+            const isHot = p.downloads_count > 1000;
+            
+            return `
+                <div class="plugin-card glass-card rounded-2xl p-6 relative">
+                    <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="window.Plugins.toggleFavorite(${p.id})" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    
+                    <div class="plugin-thumbnail cat-${p.category}" onclick="window.Plugins.showDetails(${p.id})">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        <span class="badge badge-category">${escapeHtml(p.category)}</span>
+                        <span class="badge badge-version">v${escapeHtml(p.version)}</span>
+                        ${isNew ? '<span class="badge badge-new"><i class="fas fa-sparkles"></i> NEW</span>' : ''}
+                        ${isHot ? '<span class="badge badge-hot"><i class="fas fa-fire"></i> HOT</span>' : ''}
+                    </div>
+                    
+                    <h3 class="text-lg font-bold mb-2 cursor-pointer hover:text-emerald-400 transition" onclick="window.Plugins.showDetails(${p.id})">${escapeHtml(p.name)}</h3>
+                    <p class="text-sm line-clamp-2 mb-4" style="color: var(--text-secondary);">${escapeHtml(p.description)}</p>
+                    
+                    ${rating > 0 ? `
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="flex gap-0.5">${stars}</div>
+                            <span class="text-xs font-semibold text-amber-400">${rating.toFixed(1)}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex items-center gap-3 text-xs mb-5 pb-5" style="color: var(--text-muted); border-bottom: 1px solid var(--border-color);">
+                        <span class="flex items-center gap-1"><i class="fas fa-user"></i>${escapeHtml(p.author || 'Unknown')}</span>
+                        <span>·</span>
+                        <span class="flex items-center gap-1"><i class="fas fa-hard-drive"></i>${p.size_mb}MB</span>
+                        <span>·</span>
+                        <span class="flex items-center gap-1"><i class="fas fa-download"></i>${p.downloads_count.toLocaleString()}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center gap-2">
+                        <button onclick="window.Modals.openReviewModal(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')" class="btn-ghost px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                            <i class="fas fa-star text-amber-400"></i> Review
+                        </button>
+                        <button onclick="window.Plugins.download(${p.id}, '${escapeHtml(p.name).replace(/'/g, "\\'")}')" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 flex-1 justify-center">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+    
+    showErrorState() {
+        const grid = document.getElementById('plugins-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 80px 20px;">
+                <div style="width: 100px; height: 100px; border-radius: 24px; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--text-muted); margin: 0 auto 20px;">
+                    <i class="fas fa-wifi-slash"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Connection Error</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">Failed to connect to backend</p>
+                <button onclick="window.App.loadPlugins()" class="btn-primary px-6 py-2 rounded-xl text-sm font-medium">
+                    <i class="fas fa-rotate-right mr-2"></i> Retry
+                </button>
+            </div>
+        `;
+    }
 };
 
-// Initialize
-updateUserSection();
-setupEventListeners();
-loadPlugins();
+// Plugins namespace
+window.Plugins = {
+    showDetails(id) {
+        const plugin = Search.allPlugins.find(p => p.id === id);
+        if (plugin) Modals.openPluginDetails(plugin);
+    },
+    
+    download(id, name) {
+        const url = PluginsAPI.downloadUrl(id);
+        window.location.href = url;
+        showSuccess(`Downloading ${name}...`);
+    },
+    
+    toggleFavorite(id) {
+        const favorites = Storage.getFavorites();
+        const idx = favorites.indexOf(id);
+        
+        if (idx > -1) {
+            favorites.splice(idx, 1);
+            showError('Removed from favorites');
+        } else {
+            favorites.push(id);
+            showSuccess('Added to favorites');
+        }
+        
+        Storage.setFavorites(favorites);
+        Search.apply();
+    }
+};
+
+// UI namespace for misc functions
+window.UI = {
+    copyCode(code) {
+        copyToClipboard(code).then(() => {
+            showSuccess('Copied to clipboard');
+        }).catch(() => {
+            showError('Failed to copy');
+        });
+    },
+    
+    toggleSortMenu() {
+        const menu = document.getElementById('sort-menu');
+        if (menu) menu.classList.toggle('show');
+    }
+};
+
+// Initialize app when DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => App.init());
+} else {
+    App.init();
+}
+
+window.App = App;
