@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnajakCode</title>
+    <title>AnajakCode - Minecraft Plugins</title>
+    <meta name="description" content="High-quality, production-ready Minecraft plugins. Free and open source.">
+    
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#10b981">
     
@@ -13,10 +15,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
 </head>
 <body>
-    <!-- Animated Background -->
+    <!-- Background Orbs -->
     <div class="bg-orbs">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -24,9 +28,9 @@
     </div>
 
     <!-- Navbar -->
-    <nav class="glass-nav sticky top-0 z-50 relative">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center gap-3 group">
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="nav-container">
+            <a href="/" class="flex items-center gap-3 group">
                 <div class="relative">
                     <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/50 transition">
                     <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[var(--bg-secondary)]"></div>
@@ -38,31 +42,51 @@
             </a>
             
             <div class="flex items-center gap-3">
-                <button onclick="window.App.toggleTheme()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center" title="Toggle theme">
+                <button onclick="window.Theme.toggle()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center" title="Toggle theme">
                     <i class="fas fa-sun text-amber-400" id="theme-icon"></i>
                 </button>
                 <div id="user-section" class="flex items-center gap-2"></div>
-                <a href="admin.html" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:text-emerald-400 transition" style="color: var(--text-secondary);">
+                <a href="/deshboard/" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:text-emerald-400 transition" style="color: var(--text-secondary);">
                     <i class="fas fa-shield-halved text-xs"></i>
-                    <span>Admin</span>
+                    <span>Dashboard</span>
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 pt-12 pb-20 relative z-10">
+    <main class="container">
         <!-- Hero Section -->
-        <section class="relative text-center mb-16 py-12">
-            <div class="floating-block block-1"></div>
-            <div class="floating-block block-2"></div>
-            <div class="floating-block block-3"></div>
-            <div class="floating-block block-4"></div>
-            <div class="floating-block block-5"></div>
-            
-            <h2 class="hero-title mb-6">
-                <span class="gradient-text"></span><br>
+        <section class="hero-section">
+            <h2 class="hero-title">
+                <span class="gradient-text">Minecraft Plugins</span><br>
                 <span style="color: var(--text-primary);">Plugins for Everyone</span>
             </h2>
+            
+            <p class="hero-subtitle">
+                High-quality, production-ready plugins for your minecraft server.<br class="hidden md:block">
+                Built with ❤️ by the community.
+            </p>
+
+            <!-- Stats -->
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-plugins">0</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Plugins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-downloads">0</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.8</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Avg Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Free</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Forever</div>
+                </div>
+            </div>
+
             <!-- Search -->
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
@@ -81,44 +105,92 @@
                     </h3>
                 </div>
                 
-                <div class="sort-dropdown">
-                    <button onclick="window.App.toggleSortMenu()" class="btn-ghost px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
+                <div class="sort-dropdown" style="position: relative;">
+                    <button onclick="window.UI.toggleSortMenu()" class="btn-ghost px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
                         <i class="fas fa-arrow-down-wide-short"></i>
                         <span id="sort-label">Newest</span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
-                    <div class="sort-menu" id="sort-menu">
-                        <div class="sort-option active" data-sort="newest" onclick="window.App.setSort('newest', 'Newest')">
+                    <div class="sort-menu" id="sort-menu" style="position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 20; display: none;">
+                        <div class="sort-option active" data-sort="newest" onclick="window.Search.setSort('newest', 'Newest')" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.15s;">
                             <i class="fas fa-clock w-4"></i> Newest First
                         </div>
-                        <div class="sort-option" data-sort="popular" onclick="window.App.setSort('popular', 'Most Downloaded')">
+                        <div class="sort-option" data-sort="popular" onclick="window.Search.setSort('popular', 'Most Downloaded')" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.15s;">
                             <i class="fas fa-arrow-trend-up w-4"></i> Most Downloaded
                         </div>
-                        <div class="sort-option" data-sort="rated" onclick="window.App.setSort('rated', 'Highest Rated')">
+                        <div class="sort-option" data-sort="rated" onclick="window.Search.setSort('rated', 'Highest Rated')" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.15s;">
                             <i class="fas fa-star w-4"></i> Highest Rated
                         </div>
-                        <div class="sort-option" data-sort="az" onclick="window.App.setSort('az', 'A-Z')">
+                        <div class="sort-option" data-sort="az" onclick="window.Search.setSort('az', 'A-Z')" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.15s;">
                             <i class="fas fa-arrow-down-a-z w-4"></i> Name (A-Z)
                         </div>
-                        <div class="sort-option" data-sort="favorites" onclick="window.App.setSort('favorites', 'My Favorites')">
+                        <div class="sort-option" data-sort="favorites" onclick="window.Search.setSort('favorites', 'My Favorites')" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); transition: all 0.15s;">
                             <i class="fas fa-heart w-4"></i> My Favorites
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Category Filter Chips -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button class="filter-chip active" data-category="" onclick="window.Search.setFilter('')">
+                    <i class="fas fa-th-large"></i> All
+                </button>
+                <button class="filter-chip" data-category="Core" onclick="window.Search.setFilter('Core')">
+                    <i class="fas fa-cube"></i> Core
+                </button>
+                <button class="filter-chip" data-category="World" onclick="window.Search.setFilter('World')">
+                    <i class="fas fa-globe"></i> World
+                </button>
+                <button class="filter-chip" data-category="Economy" onclick="window.Search.setFilter('Economy')">
+                    <i class="fas fa-coins"></i> Economy
+                </button>
+                <button class="filter-chip" data-category="Admin" onclick="window.Search.setFilter('Admin')">
+                    <i class="fas fa-shield-halved"></i> Admin
+                </button>
+                <button class="filter-chip" data-category="Gameplay" onclick="window.Search.setFilter('Gameplay')">
+                    <i class="fas fa-gamepad"></i> Gameplay
+                </button>
+                <button class="filter-chip" data-category="Utility" onclick="window.Search.setFilter('Utility')">
+                    <i class="fas fa-wrench"></i> Utility
+                </button>
+            </div>
+        </section>
 
         <!-- Plugins Grid -->
-        <section id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section id="plugins-grid" class="grid-plugins">
             <!-- Skeleton loading placeholders -->
-            
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
         </section>
     </main>
 
     <!-- Plugin Details Modal -->
-    <div id="details-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="modal-content rounded-2xl max-w-3xl w-full my-8 relative">
-            <button onclick="window.UI.closeDetailsModal()" class="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition z-10" style="color: var(--text-secondary);">
+    <div id="details-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+        <div class="modal-content rounded-2xl max-w-3xl w-full my-8 relative" style="animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); background: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <button onclick="window.Modals.closePluginDetails()" class="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition z-10" style="color: var(--text-secondary);">
                 <i class="fas fa-times"></i>
             </button>
             <div id="details-content">
@@ -127,51 +199,10 @@
         </div>
     </div>
 
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="modal-content rounded-2xl max-w-md w-full p-8 relative">
-            <button onclick="window.UI.closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-secondary);">
-                <i class="fas fa-times"></i>
-            </button>
-            
-            <div class="text-center mb-6">
-                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
-                    <i class="fas fa-user-astronaut text-white text-xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold" id="auth-title">Welcome Back</h3>
-                <p class="text-sm mt-1" style="color: var(--text-secondary);" id="auth-subtitle">Sign in to continue</p>
-            </div>
-            
-            <form id="auth-form" class="space-y-4">
-                <div id="username-field">
-                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Username</label>
-                    <input name="username" required class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
-                </div>
-                <div id="email-field" class="hidden">
-                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Email</label>
-                    <input name="email" type="email" class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Password</label>
-                    <input name="password" type="password" required class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
-                </div>
-                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
-                    <i class="fas fa-arrow-right-to-bracket"></i>
-                    <span id="auth-submit-text">Sign In</span>
-                </button>
-            </form>
-            
-            <div class="mt-6 text-center text-sm">
-                <span style="color: var(--text-secondary);" id="auth-switch-text">Don't have an account?</span>
-                <button onclick="window.UI.toggleAuthMode()" class="text-emerald-400 hover:text-emerald-300 ml-1 font-semibold" id="auth-switch-btn">Register</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Review Modal -->
-    <div id="review-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="modal-content rounded-2xl max-w-md w-full p-8 relative">
-            <button onclick="window.UI.closeReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-secondary);">
+    <div id="review-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+        <div class="modal-content rounded-2xl max-w-md w-full p-8 relative" style="animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); background: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <button onclick="window.Modals.closeReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-secondary);">
                 <i class="fas fa-times"></i>
             </button>
             
@@ -186,18 +217,18 @@
                 <div>
                     <label class="text-xs font-semibold mb-3 block uppercase tracking-wider" style="color: var(--text-secondary);">Rating</label>
                     <div class="flex gap-2 text-3xl" id="star-selector">
-                        <i class="fas fa-star star" data-rating="1" onclick="window.UI.setRating(1)"></i>
-                        <i class="fas fa-star star" data-rating="2" onclick="window.UI.setRating(2)"></i>
-                        <i class="fas fa-star star" data-rating="3" onclick="window.UI.setRating(3)"></i>
-                        <i class="fas fa-star star" data-rating="4" onclick="window.UI.setRating(4)"></i>
-                        <i class="fas fa-star star" data-rating="5" onclick="window.UI.setRating(5)"></i>
+                        <i class="fas fa-star star" data-rating="1" onclick="window.Modals.setRating(1)"></i>
+                        <i class="fas fa-star star" data-rating="2" onclick="window.Modals.setRating(2)"></i>
+                        <i class="fas fa-star star" data-rating="3" onclick="window.Modals.setRating(3)"></i>
+                        <i class="fas fa-star star" data-rating="4" onclick="window.Modals.setRating(4)"></i>
+                        <i class="fas fa-star star" data-rating="5" onclick="window.Modals.setRating(5)"></i>
                     </div>
                     <input type="hidden" id="review-rating" value="0">
                 </div>
                 
                 <div>
                     <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Your Review</label>
-                    <textarea id="review-comment" rows="4" required minlength="10" class="w-full px-4 py-3 rounded-xl resize-none" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);" placeholder="What do you think about this plugin?"></textarea>
+                    <textarea id="review-comment" rows="4" required minlength="10" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="What do you think about this plugin?"></textarea>
                     <p class="text-xs mt-1.5" style="color: var(--text-muted);">Minimum 10 characters</p>
                 </div>
                 
@@ -208,31 +239,16 @@
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed top-6 right-6 z-50 hidden">
-        <div class="toast rounded-xl px-5 py-4 flex items-center gap-3 min-w-[280px]">
-            <div id="toast-icon-wrapper" class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
-                <i id="toast-icon" class="fas fa-check text-emerald-400"></i>
-            </div>
-            <div class="flex-1">
-                <div class="text-sm font-semibold" id="toast-msg">Success</div>
-            </div>
-            <button onclick="window.UI.hideToast()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-muted);">
-                <i class="fas fa-times text-xs"></i>
-            </button>
-        </div>
-    </div>
-
     <!-- Back to Top -->
-    <button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 30px rgba(16,185,129,0.4); opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 40; border: none;">
         <i class="fas fa-arrow-up"></i>
     </button>
 
     <!-- Footer -->
-    <footer class="glass-nav border-t mt-12 py-10 relative z-10" style="border-color: var(--border-color);">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-2">
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
                     <div class="flex items-center gap-3 mb-4">
                         <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover">
                         <h3 class="text-lg font-bold gradient-text">AnajakCode</h3>
@@ -266,20 +282,28 @@
                         <li><a href="#" class="hover:text-emerald-400 transition">Terms</a></li>
                     </ul>
                 </div>
+                
+                <div>
+                    <h4 class="text-sm font-bold mb-3 uppercase tracking-wider" style="color: var(--text-primary);">Account</h4>
+                    <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+                        <li><a href="/login/" class="hover:text-emerald-400 transition">Login</a></li>
+                        <li><a href="/register/" class="hover:text-emerald-400 transition">Register</a></li>
+                        <li><a href="/deshboard/" class="hover:text-emerald-400 transition">Dashboard</a></li>
+                        <li><a href="/profile/" class="hover:text-emerald-400 transition">Profile</a></li>
+                    </ul>
+                </div>
             </div>
             
-            <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs" style="border-top: 1px solid var(--border-color); color: var(--text-muted);">
-                <p></p>
-                <p class="flex items-center gap-2 mono
+            <div class="footer-bottom">
+                <p>© 2026 AnajakCode. All rights reserved.</p>
+                <p class="flex items-center gap-2 mono">
+                    <i class="fas fa-code"></i> with <i class="fas fa-heart text-rose-400"></i> in Cambodia
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts (Order matters: Utils -> API -> UI -> App) -->
-    <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/api.js"></script>
-    <script type="module" src="js/ui.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <!-- Scripts -->
+    <script type="module" src="/js/app.js"></script>
 </body>
-</html>
+    </html>
