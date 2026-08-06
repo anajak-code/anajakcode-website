@@ -1,0 +1,87 @@
+/* ==================== MOBILE (max-width: 640px) ==================== */
+@media (max-width: 640px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .stat-card {
+        padding: 14px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .nav-container {
+        padding: 12px 16px;
+    }
+    
+    .search-shortcut {
+        display: none;
+    }
+}
+
+/* ==================== TABLET (min-width: 641px) ==================== */
+@media (min-width: 641px) {
+    .grid-plugins {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ==================== DESKTOP (min-width: 1024px) ==================== */
+@media (min-width: 1024px) {
+    .grid-plugins {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .footer-grid {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+    
+    .footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* ==================== LARGE DESKTOP (min-width: 1280px) ==================== */
+@media (min-width: 1280px) {
+    .grid-plugins {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ==================== PRINT ==================== */
+@media print {
+    .glass-nav,
+    .bg-orbs,
+    .back-to-top,
+    .btn-primary {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+}
