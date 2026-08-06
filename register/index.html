@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AnajakCode</title>
+    <meta name="description" content="Create your AnajakCode account">
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-card {
+            max-width: 440px;
+            width: 100%;
+            padding: 40px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            margin: 0 auto 16px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        
+        .input-wrapper input {
+            padding-left: 44px;
+        }
+        
+        .password-strength {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            transition: width 0.3s;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-wrapper">
+                <a href="/">
+                    <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="AnajakCode" class="logo-img">
+                </a>
+                <h1 class="text-2xl font-bold gradient-text mb-1">Create Account</h1>
+                <p class="text-sm" style="color: var(--text-secondary);">Join the AnajakCode community</p>
+            </div>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" name="username" required minlength="3" placeholder="Choose a username" autocomplete="username">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" required placeholder="your@email.com" autocomplete="email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password" required minlength="6" placeholder="Min 6 characters" autocomplete="new-password" id="password-input">
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strength-bar"></div>
+                    </div>
+                    <p class="text-xs mt-1" style="color: var(--text-muted);" id="strength-text">Use 6 or more characters</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="confirm-password" required placeholder="Repeat password" autocomplete="new-password">
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-2 mb-6">
+                    <input type="checkbox" id="terms" required style="width: auto; margin-top: 4px;">
+                    <label for="terms" class="text-sm" style="color: var(--text-secondary);">
+                        I agree to the <a href="#" class="text-emerald-400">Terms of Service</a> and <a href="#" class="text-emerald-400">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold" id="register-btn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create Account</span>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center text-sm">
+                <span style="color: var(--text-secondary);">Already have an account?</span>
+                <a href="/login/" class="text-emerald-400 hover:text-emerald-300 ml-1 font-semibold">Sign In</a>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <a href="/" class="text-sm" style="color: var(--text-muted);">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Auth } from '/js/auth.js';
+        import { Theme } from '/js/theme.js';
+        import { showError, showSuccess } from '/js/notifications.js';
+        
+        Theme.init();
+        
+        // Password strength checker
+        const passwordInput = document.getElementById('password-input');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        
+        passwordInput.addEventListener('input', (e) => {
+            const password = e.target.value;
+            let strength = 0;
+            
+            if (password.length >= 6) strength += 25;
+            if (password.length >= 10) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 25) strengthText.textContent = 'Too weak';
+            else if (strength < 50) strengthText.textContent = 'Weak';
+            else if (strength < 75) strengthText.textContent = 'Good';
+            else strengthText.textContent = 'Strong';
+        });
+        
+        const form = document.getElementById('register-form');
+        const btn = document.getElementById('register-btn');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const username = formData.get('username');
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm-password');
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> <span>Creating account...</span>';
+            
+            try {
+                await Auth.register(username, email, password);
+                showSuccess('Account created! Please login.');
+                setTimeout(() => {
+                    window.location.href = '/login/';
+                }, 1500);
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> <span>Create Account</span>';
+            }
+        });
+    </script>
+</body>
+</html>
