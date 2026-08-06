@@ -1,41 +1,360 @@
 <!DOCTYPE html>
-<html lang="km">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnajakCode Website</title>
-    <link rel="manifest" href="manifest.json">
+    <title>AnajakCode</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-    <meta name="theme-color" content="#1f2937">
 </head>
 <body>
-    <header class="navbar">
-        <h1 class="logo">AnajakCode</h1>
-        <nav>
-            <button id="themeToggle" class="btn-icon">🌓</button>
-            <button id="loginBtn" class="btn btn-primary">Login</button>
-        </nav>
-    </header>
+    <!-- Animated Background -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
-    <main id="app">
-        <section id="hero">
-            <h2>Welcome to AnajakCode</h2>
-            <p>Discover amazing content</p>
+    <!-- Navbar -->
+    <nav class="glass-nav sticky top-0 z-50 relative">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="relative">
+                    <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-500/20 group-hover:ring-emerald-500/50 transition">
+                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[var(--bg-secondary)]"></div>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold gradient-text">AnajakCode</h1>
+                    <p class="text-[10px] font-mono" style="color: var(--text-muted);">MINECRAFT · PLUGINS</p>
+                </div>
+            </a>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="window.App.toggleTheme()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center" title="Toggle theme">
+                    <i class="fas fa-sun text-amber-400" id="theme-icon"></i>
+                </button>
+                <div id="user-section" class="flex items-center gap-2"></div>
+                <a href="admin.html" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:text-emerald-400 transition" style="color: var(--text-secondary);">
+                    <i class="fas fa-shield-halved text-xs"></i>
+                    <span>Admin</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 pt-12 pb-20 relative z-10">
+        <!-- Hero Section -->
+        <section class="relative text-center mb-16 py-12">
+            <div class="floating-block block-1"></div>
+            <div class="floating-block block-2"></div>
+            <div class="floating-block block-3"></div>
+            <div class="floating-block block-4"></div>
+            <div class="floating-block block-5"></div>
+            
+            <h2 class="hero-title mb-6">
+                <span class="gradient-text">Minecraft Plugins</span><br>
+                <span style="color: var(--text-primary);">Plugins for Everyone</span>
+            </h2>
+            
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10" style="color: var(--text-secondary);">
+                High-quality, production-ready plugins for your minecraft server.<br class="hidden md:block">
+                Built with ❤️ by the community.
+            </p>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-plugins">0</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Plugins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-downloads">0</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.8</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Avg Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Free</div>
+                    <div class="text-xs mt-1 uppercase tracking-wider" style="color: var(--text-muted);">Forever</div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search" class="search-input" placeholder="Search plugins by name, description, or tag...">
+                <span class="search-shortcut hidden md:block">⌘ K</span>
+            </div>
         </section>
-        <section id="content"></section>
+
+        <!-- Filter & Sort Bar -->
+        <section class="mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-bold" style="color: var(--text-primary);">
+                        <i class="fas fa-fire text-emerald-400 mr-2"></i>
+                        <span id="results-count">All Plugins</span>
+                    </h3>
+                </div>
+                
+                <div class="sort-dropdown">
+                    <button onclick="window.App.toggleSortMenu()" class="btn-ghost px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
+                        <i class="fas fa-arrow-down-wide-short"></i>
+                        <span id="sort-label">Newest</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="sort-menu" id="sort-menu">
+                        <div class="sort-option active" data-sort="newest" onclick="window.App.setSort('newest', 'Newest')">
+                            <i class="fas fa-clock w-4"></i> Newest First
+                        </div>
+                        <div class="sort-option" data-sort="popular" onclick="window.App.setSort('popular', 'Most Downloaded')">
+                            <i class="fas fa-arrow-trend-up w-4"></i> Most Downloaded
+                        </div>
+                        <div class="sort-option" data-sort="rated" onclick="window.App.setSort('rated', 'Highest Rated')">
+                            <i class="fas fa-star w-4"></i> Highest Rated
+                        </div>
+                        <div class="sort-option" data-sort="az" onclick="window.App.setSort('az', 'A-Z')">
+                            <i class="fas fa-arrow-down-a-z w-4"></i> Name (A-Z)
+                        </div>
+                        <div class="sort-option" data-sort="favorites" onclick="window.App.setSort('favorites', 'My Favorites')">
+                            <i class="fas fa-heart w-4"></i> My Favorites
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filter Chips -->
+            <div class="flex flex-wrap gap-2 mb-6" id="filter-chips">
+                <button class="filter-chip active" data-category="" onclick="window.App.filterCategory('')">
+                    <i class="fas fa-th-large"></i> All
+                </button>
+                <button class="filter-chip" data-category="Core" onclick="window.App.filterCategory('Core')">
+                    <i class="fas fa-cube"></i> Core
+                </button>
+                <button class="filter-chip" data-category="World" onclick="window.App.filterCategory('World')">
+                    <i class="fas fa-globe"></i> World
+                </button>
+                <button class="filter-chip" data-category="Economy" onclick="window.App.filterCategory('Economy')">
+                    <i class="fas fa-coins"></i> Economy
+                </button>
+                <button class="filter-chip" data-category="Admin" onclick="window.App.filterCategory('Admin')">
+                    <i class="fas fa-shield-halved"></i> Admin
+                </button>
+                <button class="filter-chip" data-category="Gameplay" onclick="window.App.filterCategory('Gameplay')">
+                    <i class="fas fa-gamepad"></i> Gameplay
+                </button>
+                <button class="filter-chip" data-category="Utility" onclick="window.App.filterCategory('Utility')">
+                    <i class="fas fa-wrench"></i> Utility
+                </button>
+            </div>
+        </section>
+
+        <!-- Plugins Grid -->
+        <section id="plugins-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Skeleton loading placeholders -->
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="skeleton h-32 mb-4 rounded-xl"></div>
+                <div class="skeleton h-4 w-1/3 mb-3"></div>
+                <div class="skeleton h-6 w-2/3 mb-3"></div>
+                <div class="skeleton h-4 mb-2"></div>
+                <div class="skeleton h-4 w-4/5 mb-4"></div>
+                <div class="skeleton h-10 mt-4"></div>
+            </div>
+        </section>
     </main>
 
-    <!-- Modal Container -->
-    <div id="modalOverlay" class="modal-overlay hidden"></div>
+    <!-- Plugin Details Modal -->
+    <div id="details-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="modal-content rounded-2xl max-w-3xl w-full my-8 relative">
+            <button onclick="window.UI.closeDetailsModal()" class="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition z-10" style="color: var(--text-secondary);">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="details-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content rounded-2xl max-w-md w-full p-8 relative">
+            <button onclick="window.UI.closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-secondary);">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
+                    <i class="fas fa-user-astronaut text-white text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold" id="auth-title">Welcome Back</h3>
+                <p class="text-sm mt-1" style="color: var(--text-secondary);" id="auth-subtitle">Sign in to continue</p>
+            </div>
+            
+            <form id="auth-form" class="space-y-4">
+                <div id="username-field">
+                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Username</label>
+                    <input name="username" required class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                </div>
+                <div id="email-field" class="hidden">
+                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Email</label>
+                    <input name="email" type="email" class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Password</label>
+                    <input name="password" type="password" required class="w-full px-4 py-3 rounded-xl" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right-to-bracket"></i>
+                    <span id="auth-submit-text">Sign In</span>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center text-sm">
+                <span style="color: var(--text-secondary);" id="auth-switch-text">Don't have an account?</span>
+                <button onclick="window.UI.toggleAuthMode()" class="text-emerald-400 hover:text-emerald-300 ml-1 font-semibold" id="auth-switch-btn">Register</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- JS Modules -->
-    <script src="js/theme.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/modals.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="modal-content rounded-2xl max-w-md w-full p-8 relative">
+            <button onclick="window.UI.closeReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-secondary);">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold mb-1">Share your thoughts</h3>
+                <p class="text-sm" style="color: var(--text-secondary);" id="review-plugin-name"></p>
+            </div>
+            
+            <form id="review-form" class="space-y-5">
+                <input type="hidden" id="review-plugin-id">
+                
+                <div>
+                    <label class="text-xs font-semibold mb-3 block uppercase tracking-wider" style="color: var(--text-secondary);">Rating</label>
+                    <div class="flex gap-2 text-3xl" id="star-selector">
+                        <i class="fas fa-star star" data-rating="1" onclick="window.UI.setRating(1)"></i>
+                        <i class="fas fa-star star" data-rating="2" onclick="window.UI.setRating(2)"></i>
+                        <i class="fas fa-star star" data-rating="3" onclick="window.UI.setRating(3)"></i>
+                        <i class="fas fa-star star" data-rating="4" onclick="window.UI.setRating(4)"></i>
+                        <i class="fas fa-star star" data-rating="5" onclick="window.UI.setRating(5)"></i>
+                    </div>
+                    <input type="hidden" id="review-rating" value="0">
+                </div>
+                
+                <div>
+                    <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Your Review</label>
+                    <textarea id="review-comment" rows="4" required minlength="10" class="w-full px-4 py-3 rounded-xl resize-none" style="background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary);" placeholder="What do you think about this plugin?"></textarea>
+                    <p class="text-xs mt-1.5" style="color: var(--text-muted);">Minimum 10 characters</p>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold">
+                    <i class="fas fa-paper-plane mr-2"></i> Submit Review
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-6 right-6 z-50 hidden">
+        <div class="toast rounded-xl px-5 py-4 flex items-center gap-3 min-w-[280px]">
+            <div id="toast-icon-wrapper" class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: rgba(16,185,129,0.15);">
+                <i id="toast-icon" class="fas fa-check text-emerald-400"></i>
+            </div>
+            <div class="flex-1">
+                <div class="text-sm font-semibold" id="toast-msg">Success</div>
+            </div>
+            <button onclick="window.UI.hideToast()" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]" style="color: var(--text-muted);">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="glass-nav border-t mt-12 py-10 relative z-10" style="border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover">
+                        <h3 class="text-lg font-bold gradient-text">AnajakCode</h3>
+                    </div>
+                    <p class="text-sm mb-4 max-w-sm" style="color: var(--text-secondary);">
+                        Free, high-quality Minecraft plugins built with love for the community. Open source, forever.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);"><i class="fab fa-github"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-sm font-bold mb-3 uppercase tracking-wider" style="color: var(--text-primary);">Resources</h4>
+                    <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+                        <li><a href="#" class="hover:text-emerald-400 transition">Documentation</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">API Reference</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">Community</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-sm font-bold mb-3 uppercase tracking-wider" style="color: var(--text-primary);">Company</h4>
+                    <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+                        <li><a href="#" class="hover:text-emerald-400 transition">About</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">Privacy</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs" style="border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                <p>© 2026 AnajakCode. All rights reserved.</p>
+                <p class="flex items-center gap-2 mono">
+                    <i class="fas fa-code"></i> with <i class="fas fa-heart text-rose-400"></i> in Cambodia
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts (Order matters: Utils -> API -> UI -> App) -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
