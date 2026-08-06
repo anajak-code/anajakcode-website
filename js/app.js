@@ -9,7 +9,7 @@
     // ==================== CONFIGURATION ====================
     const CONFIG = {
         // ✅ សំខាន់: កែ URL នេះឱ្យត្រូវនឹង backend របស់អ្នក
-        API_BASE: 'https://api.anajakcode.site/api/v1',
+        API_BASE: 'https://router.anajakcode.site/api/v1',
         // បើ frontend និង backend នៅ domain ផ្សេង ប្រើនេះ៖
         // API_BASE: 'https://api.anajakcode.site/api/v1',
         
