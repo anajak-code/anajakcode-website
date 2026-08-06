@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AnajakCode</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="nav-container">
+            <a href="/" class="flex items-center gap-3">
+                <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover">
+                <h1 class="text-lg font-bold gradient-text">AnajakCode</h1>
+            </a>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="window.Theme.toggle()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+                    <i class="fas fa-sun text-amber-400" id="theme-icon"></i>
+                </button>
+                <div id="user-section"></div>
+                <a href="/deshboard/" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:text-emerald-400 transition" style="color: var(--text-secondary);">
+                    <i class="fas fa-shield-halved text-xs"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="mb-8">
+            <a href="/deshboard/" class="inline-flex items-center gap-2 mb-4 text-sm" style="color: var(--text-secondary);">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-bold mb-2">Profile Settings</h1>
+            <p style="color: var(--text-secondary);">Manage your account information</p>
+        </section>
+
+        <!-- Profile Card -->
+        <section class="glass-card p-8 mb-6">
+            <div class="flex items-center gap-6 mb-8 flex-wrap">
+                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-3xl font-bold" id="avatar">
+                    U
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold mb-1" id="profile-username">Username</h2>
+                    <p class="text-sm mb-2" style="color: var(--text-secondary);" id="profile-email">email@example.com</p>
+                    <div class="flex gap-2">
+                        <span class="badge badge-category" id="profile-role">User</span>
+                        <span class="badge badge-version" id="profile-joined">Joined -</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Grid -->
+        <section class="grid-2 mb-6">
+            <!-- Personal Info -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">
+                    <i class="fas fa-user mr-2 text-emerald-400"></i>Personal Info
+                </h3>
+                <form id="profile-form" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Username</label>
+                        <input type="text" id="input-username" disabled style="opacity: 0.7;">
+                        <p class="text-xs mt-1" style="color: var(--text-muted);">Username cannot be changed</p>
+                    </div>
+                    
+                    <div>
+                        <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Email</label>
+                        <input type="email" id="input-email">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Change Password -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">
+                    <i class="fas fa-lock mr-2 text-cyan-400"></i>Change Password
+                </h3>
+                <form id="password-form" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Current Password</label>
+                        <input type="password" id="current-password" required>
+                    </div>
+                    
+                    <div>
+                        <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">New Password</label>
+                        <input type="password" id="new-password" required minlength="6">
+                    </div>
+                    
+                    <div>
+                        <label class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color: var(--text-secondary);">Confirm New Password</label>
+                        <input type="password" id="confirm-password" required minlength="6">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold">
+                        <i class="fas fa-key"></i> Update Password
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="glass-card p-6" style="border-color: rgba(239, 68, 68, 0.3);">
+            <h3 class="text-lg font-bold mb-2 text-red-500">
+                <i class="fas fa-triangle-exclamation mr-2"></i>Danger Zone
+            </h3>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">
+                Irreversible actions. Please be careful.
+            </p>
+            <button onclick="confirmDeleteAccount()" class="btn-danger">
+                <i class="fas fa-trash"></i> Delete Account
+            </button>
+        </section>
+    </main>
+
+    <script type="module">
+        import { Auth } from '/js/auth.js';
+        import { Theme } from '/js/theme.js';
+        import { showSuccess, showError, showWarning } from '/js/notifications.js';
+        import { AuthAPI } from '/js/api.js';
+        
+        Theme.init();
+        
+        if (!Auth.requireAuth()) return;
+        
+        const user = Auth.getCurrentUser();
+        Auth.updateUserUI();
+        
+        // Populate profile
+        document.getElementById('avatar').textContent = user.username.charAt(0).toUpperCase();
+        document.getElementById('profile-username').textContent = user.username;
+        document.getElementById('profile-email').textContent = user.email;
+        document.getElementById('profile-role').textContent = user.role;
+        document.getElementById('input-username').value = user.username;
+        document.getElementById('input-email').value = user.email;
+        
+        if (user.created_at) {
+            document.getElementById('profile-joined').textContent = 'Joined ' + new Date(user.created_at).toLocaleDateString();
+        }
+        
+        // Password form
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentPass = document.getElementById('current-password').value;
+            const newPass = document.getElementById('new-password').value;
+            const confirmPass = document.getElementById('confirm-password').value;
+            
+            if (newPass !== confirmPass) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            try {
+                const res = await AuthAPI.changePassword(currentPass, newPass);
+                if (res.ok) {
+                    showSuccess('Password changed successfully');
+                    e.target.reset();
+                } else {
+                    const err = await res.json();
+                    showError(err.detail || 'Failed to change password');
+                }
+            } catch (err) {
+                showError('Error changing password');
+            }
+        });
+        
+        window.confirmDeleteAccount = () => {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                showWarning('Account deletion not yet implemented');
+            }
+        };
+    </script>
+</body>
+</html>
