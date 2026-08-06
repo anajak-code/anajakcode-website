@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | AnajakCode</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .error-code {
+            font-size: clamp(6rem, 20vw, 12rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #10b981, #06b6d4, #8b5cf6);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 24px;
+            animation: gradientShift 6s ease infinite;
+        }
+        
+        .floating-block {
+            position: absolute;
+            border-radius: 8px;
+            opacity: 0.15;
+            animation: blockFloat 15s infinite ease-in-out;
+        }
+        
+        .block-1 { width: 40px; height: 40px; top: 20%; left: 15%; background: #10b981; }
+        .block-2 { width: 30px; height: 30px; top: 30%; right: 20%; background: #22d3ee; animation-delay: -3s; }
+        .block-3 { width: 50px; height: 50px; bottom: 25%; left: 25%; background: #fbbf24; animation-delay: -6s; }
+        .block-4 { width: 35px; height: 35px; bottom: 30%; right: 15%; background: #a855f7; animation-delay: -9s; }
+    </style>
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="error-container">
+        <div class="floating-block block-1"></div>
+        <div class="floating-block block-2"></div>
+        <div class="floating-block block-3"></div>
+        <div class="floating-block block-4"></div>
+        
+        <div style="max-width: 600px;">
+            <div class="error-code">404</div>
+            
+            <h1 class="text-3xl md:text-4xl font-bold mb-4" style="color: var(--text-primary);">
+                Oops! Page Not Found
+            </h1>
+            
+            <p class="text-lg mb-8" style="color: var(--text-secondary);">
+                The page you're looking for doesn't exist or has been moved.<br>
+                Maybe try going back to the home page?
+            </p>
+            
+            <div class="flex flex-wrap gap-3 justify-center">
+                <a href="/" class="btn-primary px-6 py-3 rounded-xl font-semibold">
+                    <i class="fas fa-home"></i>
+                    Go Home
+                </a>
+                <button onclick="window.history.back()" class="btn-ghost px-6 py-3 rounded-xl font-semibold">
+                    <i class="fas fa-arrow-left"></i>
+                    Go Back
+                </button>
+            </div>
+            
+            <div class="mt-12 pt-8" style="border-top: 1px solid var(--border-color);">
+                <p class="text-sm mb-4" style="color: var(--text-muted);">Popular pages:</p>
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <a href="/" class="px-3 py-1 rounded-lg text-sm hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);">
+                        <i class="fas fa-puzzle-piece mr-1"></i> Plugins
+                    </a>
+                    <a href="/login/" class="px-3 py-1 rounded-lg text-sm hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Login
+                    </a>
+                    <a href="/register/" class="px-3 py-1 rounded-lg text-sm hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);">
+                        <i class="fas fa-user-plus mr-1"></i> Register
+                    </a>
+                    <a href="/deshboard/" class="px-3 py-1 rounded-lg text-sm hover:bg-[var(--bg-tertiary)] transition" style="color: var(--text-secondary);">
+                        <i class="fas fa-shield-halved mr-1"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-set theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>
