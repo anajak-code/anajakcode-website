@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AnajakCode</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="nav-container">
+            <a href="/" class="flex items-center gap-3">
+                <img src="https://i.ibb.co/7xPKHNSK/smail.webp" alt="Logo" class="w-10 h-10 rounded-xl object-cover">
+                <div>
+                    <h1 class="text-lg font-bold gradient-text">AnajakCode</h1>
+                    <p class="text-[10px] font-mono" style="color: var(--text-muted);">DASHBOARD</p>
+                </div>
+            </a>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="window.Theme.toggle()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
+                    <i class="fas fa-sun text-amber-400" id="theme-icon"></i>
+                </button>
+                <div id="user-section" class="flex items-center gap-2"></div>
+                <a href="/" class="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium hover:text-emerald-400 transition" style="color: var(--text-secondary);">
+                    <i class="fas fa-home text-xs"></i>
+                    <span>Home</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Welcome Header -->
+        <section class="mb-8 fade-in">
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+                Welcome back, <span class="gradient-text" id="username-display">User</span>! 👋
+            </h1>
+            <p style="color: var(--text-secondary);">Here's what's happening with your account</p>
+        </section>
+
+        <!-- Stats Cards -->
+        <section class="grid-4 mb-8">
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-download text-2xl" style="color: #10b981;"></i>
+                    <span class="badge badge-new">Total</span>
+                </div>
+                <h3 class="text-sm" style="color: var(--text-secondary);">Downloads</h3>
+                <p class="text-3xl font-bold" id="user-downloads">0</p>
+            </div>
+            
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-star text-2xl" style="color: #fbbf24;"></i>
+                    <span class="badge badge-new">Reviews</span>
+                </div>
+                <h3 class="text-sm" style="color: var(--text-secondary);">Reviews</h3>
+                <p class="text-3xl font-bold" id="user-reviews">0</p>
+            </div>
+            
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-heart text-2xl" style="color: #ef4444;"></i>
+                    <span class="badge badge-new">Favorites</span>
+                </div>
+                <h3 class="text-sm" style="color: var(--text-secondary);">Favorites</h3>
+                <p class="text-3xl font-bold" id="user-favorites">0</p>
+            </div>
+            
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <i class="fas fa-calendar text-2xl" style="color: #06b6d4;"></i>
+                    <span class="badge badge-new">Member</span>
+                </div>
+                <h3 class="text-sm" style="color: var(--text-secondary);">Since</h3>
+                <p class="text-2xl font-bold" id="user-joined">-</p>
+            </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section class="grid-2 mb-8">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">
+                    <i class="fas fa-chart-line mr-2 text-emerald-400"></i>Your Download Activity
+                </h3>
+                <canvas id="activityChart" height="200"></canvas>
+            </div>
+            
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">
+                    <i class="fas fa-chart-pie mr-2 text-cyan-400"></i>Favorite Categories
+                </h3>
+                <canvas id="categoryChart" height="200"></canvas>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="glass-card p-6 mb-8">
+            <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">
+                <i class="fas fa-clock mr-2 text-amber-400"></i>Recent Activity
+            </h3>
+            <div id="activity-list" class="space-y-3">
+                <div class="text-center py-8" style="color: var(--text-muted);">
+                    <i class="fas fa-circle-info text-2xl mb-2"></i>
+                    <p>No activity yet. Start by downloading some plugins!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="grid-3 mb-8">
+            <a href="/" class="glass-card p-6 text-center hover:border-emerald-500/30 transition">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-emerald flex items-center justify-center" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-puzzle-piece text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-1" style="color: var(--text-primary);">Browse Plugins</h3>
+                <p class="text-sm" style="color: var(--text-secondary);">Discover new plugins</p>
+            </a>
+            
+            <a href="/profile/" class="glass-card p-6 text-center hover:border-emerald-500/30 transition">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <i class="fas fa-user text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-1" style="color: var(--text-primary);">Edit Profile</h3>
+                <p class="text-sm" style="color: var(--text-secondary);">Update your info</p>
+            </a>
+            
+            <a href="#" class="glass-card p-6 text-center hover:border-emerald-500/30 transition">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <i class="fas fa-book text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-1" style="color: var(--text-primary);">Documentation</h3>
+                <p class="text-sm" style="color: var(--text-secondary);">Learn how to use</p>
+            </a>
+        </section>
+    </main>
+
+    <script type="module">
+        import { Auth } from '/js/auth.js';
+        import { Theme } from '/js/theme.js';
+        import { Storage } from '/js/storage.js';
+        import { AdminAPI } from '/js/api.js';
+        
+        Theme.init();
+        
+        if (!Auth.requireAuth()) return;
+        
+        const user = Auth.getCurrentUser();
+        document.getElementById('username-display').textContent = user.username;
+        Auth.updateUserUI();
+        
+        // Load user stats
+        document.getElementById('user-downloads').textContent = user.downloads_count || 0;
+        document.getElementById('user-reviews').textContent = '0'; // Will be fetched
+        document.getElementById('user-favorites').textContent = Storage.getFavorites().length;
+        
+        if (user.created_at) {
+            document.getElementById('user-joined').textContent = new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>
